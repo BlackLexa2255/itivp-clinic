@@ -1,0 +1,20 @@
+{
+  "name": "itivp-clinic",
+  "version": "1.0.0",
+  "description": "Лабораторная работа 1. REST API сервиса записи на приём к врачу с электронной картой пациента",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": ["nodejs", "express", "rest-api"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}

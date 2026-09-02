@@ -1,0 +1,126 @@
+### Лабораторная работа 1 — проверка API через REST Client (VS Code)
+### Установите расширение "REST Client" и нажимайте "Send Request" над каждым запросом.
+
+@baseUrl = http://localhost:3000
+
+### Справка по API
+GET {{baseUrl}}/
+
+### Список всех записей на приём — 200
+GET {{baseUrl}}/api/appointments
+
+### Фильтр по строке запроса (query string) — 200
+GET {{baseUrl}}/api/appointments?status=scheduled
+
+### Одна запись по id (route param) — 200
+GET {{baseUrl}}/api/appointments/1
+
+### Несуществующая запись — 404
+GET {{baseUrl}}/api/appointments/999
+
+### Создание записи на приём — 201
+POST {{baseUrl}}/api/appointments
+Content-Type: application/json
+
+{
+  "patientId": 1,
+  "doctorName": "Козлов Игорь Львович",
+  "specialty": "невролог",
+  "date": "2026-09-15",
+  "time": "11:00"
+}
+
+### Создание без обязательных полей — 400
+POST {{baseUrl}}/api/appointments
+Content-Type: application/json
+
+{}
+
+### Полное обновление записи — 200
+PUT {{baseUrl}}/api/appointments/4
+Content-Type: application/json
+
+{
+  "patientId": 2,
+  "doctorName": "Козлов Игорь Львович",
+  "specialty": "невролог",
+  "date": "2026-09-16",
+  "time": "13:30",
+  "status": "completed"
+}
+
+### Обновление несуществующей записи — 404
+PUT {{baseUrl}}/api/appointments/999
+Content-Type: application/json
+
+{
+  "patientId": 1,
+  "doctorName": "Нет Такого",
+  "date": "2026-09-16",
+  "time": "13:30"
+}
+
+### Удаление записи — 204
+DELETE {{baseUrl}}/api/appointments/4
+
+### Повторное удаление той же записи — 404
+DELETE {{baseUrl}}/api/appointments/4
+
+### Список пациентов — 200
+GET {{baseUrl}}/api/patients
+
+### Пациент с электронной картой — 200
+GET {{baseUrl}}/api/patients/1
+
+### Несуществующий пациент — 404
+GET {{baseUrl}}/api/patients/999
+
+### Добавление пациента — 201
+POST {{baseUrl}}/api/patients
+Content-Type: application/json
+
+{
+  "fullName": "Новиков Денис Олегович",
+  "birthDate": "1995-07-19",
+  "phone": "+375291112233",
+  "medicalRecord": {
+    "bloodType": "AB(IV) Rh+",
+    "allergies": [],
+    "diagnoses": []
+  }
+}
+
+### Добавление пациента без обязательных полей — 400
+POST {{baseUrl}}/api/patients
+Content-Type: application/json
+
+{
+  "phone": "+375291112233"
+}
+
+### Полное обновление пациента — 200
+PUT {{baseUrl}}/api/patients/4
+Content-Type: application/json
+
+{
+  "fullName": "Новиков Денис Олегович",
+  "birthDate": "1995-07-19",
+  "phone": "+375290000000",
+  "medicalRecord": {
+    "bloodType": "AB(IV) Rh+",
+    "allergies": ["йод"],
+    "diagnoses": ["ОРВИ"]
+  }
+}
+
+### Удаление пациента — 204
+DELETE {{baseUrl}}/api/patients/4
+
+### Неизвестный маршрут — 404
+GET {{baseUrl}}/api/doctors
+
+### Некорректный JSON в теле — 400 из глобального обработчика ошибок
+POST {{baseUrl}}/api/patients
+Content-Type: application/json
+
+{fullName: сломанный}
