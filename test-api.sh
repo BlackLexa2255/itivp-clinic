@@ -1,5 +1,4 @@
 #!/bin/bash
-# Запуск: bash test-api.sh (сервер должен быть запущен)
 
 BASE_URL="http://localhost:3000"
 
