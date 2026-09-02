@@ -1,51 +1,46 @@
 ###################  РЕСУРС: ЗАПИСИ НА ПРИЁМ  ####################
 ==================================================================
->>> GET /
-{"service":"Сервис записи на приём к врачу с электронной картой пациента","endpoints":["/api/appointments","/api/patients"]}
->>> HTTP-статус: 200
-
-==================================================================
 >>> GET /api/appointments
-[{"id":1,"patientId":1,"doctorName":"Петров Пётр Петрович","specialty":"терапевт","date":"2026-09-10","time":"10:30","status":"scheduled"},{"id":2,"patientId":2,"doctorName":"Сидорова Анна Сергеевна","specialty":"кардиолог","date":"2026-09-11","time":"09:00","status":"completed"},{"id":3,"patientId":3,"doctorName":"Петров Пётр Петрович","specialty":"терапевт","date":"2026-09-12","time":"14:15","status":"cancelled"}]
+[{"id":1,"patientId":1,"doctorName":"Петров Пётр Петрович","date":"2026-09-10","time":"10:30","status":"scheduled"},{"id":2,"patientId":2,"doctorName":"Сидорова Анна Сергеевна","date":"2026-09-11","time":"09:00","status":"completed"},{"id":3,"patientId":1,"doctorName":"Петров Пётр Петрович","date":"2026-09-12","time":"14:15","status":"cancelled"}]
 >>> HTTP-статус: 200
 
 ==================================================================
 >>> GET /api/appointments?status=scheduled
-[{"id":1,"patientId":1,"doctorName":"Петров Пётр Петрович","specialty":"терапевт","date":"2026-09-10","time":"10:30","status":"scheduled"}]
+[{"id":1,"patientId":1,"doctorName":"Петров Пётр Петрович","date":"2026-09-10","time":"10:30","status":"scheduled"}]
 >>> HTTP-статус: 200
 
 ==================================================================
 >>> GET /api/appointments/1
-{"id":1,"patientId":1,"doctorName":"Петров Пётр Петрович","specialty":"терапевт","date":"2026-09-10","time":"10:30","status":"scheduled"}
+{"id":1,"patientId":1,"doctorName":"Петров Пётр Петрович","date":"2026-09-10","time":"10:30","status":"scheduled"}
 >>> HTTP-статус: 200
 
 ==================================================================
 >>> GET /api/appointments/999
-{"error":"Запись на приём с id=999 не найдена"}
+{"error":"Запись на приём не найдена"}
 >>> HTTP-статус: 404
 
 ==================================================================
 >>> POST /api/appointments
->>> Тело запроса: {"patientId":1,"doctorName":"Козлов Игорь Львович","specialty":"невролог","date":"2026-09-15","time":"11:00"}
-{"id":4,"patientId":1,"doctorName":"Козлов Игорь Львович","specialty":"невролог","date":"2026-09-15","time":"11:00","status":"scheduled"}
+>>> Тело запроса: {"patientId":1,"doctorName":"Козлов Игорь Львович","date":"2026-09-15","time":"11:00"}
+{"id":4,"patientId":1,"doctorName":"Козлов Игорь Львович","date":"2026-09-15","time":"11:00","status":"scheduled"}
 >>> HTTP-статус: 201
 
 ==================================================================
 >>> POST /api/appointments
 >>> Тело запроса: {}
-{"error":"Не заполнены обязательные поля: patientId, doctorName, date, time"}
+{"error":"Заполните поля: patientId, doctorName, date, time"}
 >>> HTTP-статус: 400
 
 ==================================================================
 >>> PUT /api/appointments/5
->>> Тело запроса: {"patientId":2,"doctorName":"Козлов Игорь Львович","specialty":"невролог","date":"2026-09-16","time":"13:30","status":"completed"}
-{"id":5,"patientId":2,"doctorName":"Козлов Игорь Львович","specialty":"невролог","date":"2026-09-16","time":"13:30","status":"completed"}
+>>> Тело запроса: {"patientId":2,"doctorName":"Козлов Игорь Львович","date":"2026-09-16","time":"13:30","status":"completed"}
+{"id":5,"patientId":2,"doctorName":"Козлов Игорь Львович","date":"2026-09-16","time":"13:30","status":"completed"}
 >>> HTTP-статус: 200
 
 ==================================================================
 >>> PUT /api/appointments/999
 >>> Тело запроса: {"patientId":1,"doctorName":"Нет Такого","date":"2026-09-16","time":"13:30"}
-{"error":"Запись на приём с id=999 не найдена"}
+{"error":"Запись на приём не найдена"}
 >>> HTTP-статус: 404
 
 ==================================================================
@@ -55,63 +50,51 @@
 
 ==================================================================
 >>> DELETE /api/appointments/5
-{"error":"Запись на приём с id=5 не найдена"}
+{"error":"Запись на приём не найдена"}
 >>> HTTP-статус: 404
 
 #####################  РЕСУРС: ПАЦИЕНТЫ  ########################
 ==================================================================
 >>> GET /api/patients
-[{"id":1,"fullName":"Иванов Иван Иванович","birthDate":"1990-05-14","phone":"+375291234567","medicalRecord":{"bloodType":"A(II) Rh+","allergies":["пенициллин"],"diagnoses":["ОРВИ"]}},{"id":2,"fullName":"Ковалёва Мария Петровна","birthDate":"1985-11-02","phone":"+375447654321","medicalRecord":{"bloodType":"O(I) Rh-","allergies":[],"diagnoses":["гипертония"]}},{"id":3,"fullName":"Смирнов Алексей Викторович","birthDate":"2001-03-27","phone":"+375339876543","medicalRecord":{"bloodType":"B(III) Rh+","allergies":["пыльца"],"diagnoses":[]}}]
+[{"id":1,"fullName":"Иванов Иван Иванович","birthDate":"1990-05-14","medicalRecord":{"bloodType":"A(II) Rh+","allergies":["пенициллин"],"diagnoses":["ОРВИ"]}},{"id":2,"fullName":"Ковалёва Мария Петровна","birthDate":"1985-11-02","medicalRecord":{"bloodType":"O(I) Rh-","allergies":[],"diagnoses":["гипертония"]}}]
 >>> HTTP-статус: 200
 
 ==================================================================
 >>> GET /api/patients/1
-{"id":1,"fullName":"Иванов Иван Иванович","birthDate":"1990-05-14","phone":"+375291234567","medicalRecord":{"bloodType":"A(II) Rh+","allergies":["пенициллин"],"diagnoses":["ОРВИ"]}}
+{"id":1,"fullName":"Иванов Иван Иванович","birthDate":"1990-05-14","medicalRecord":{"bloodType":"A(II) Rh+","allergies":["пенициллин"],"diagnoses":["ОРВИ"]}}
 >>> HTTP-статус: 200
 
 ==================================================================
 >>> GET /api/patients/999
-{"error":"Пациент с id=999 не найден"}
+{"error":"Пациент не найден"}
 >>> HTTP-статус: 404
 
 ==================================================================
 >>> POST /api/patients
->>> Тело запроса: {"fullName":"Новиков Денис Олегович","birthDate":"1995-07-19","phone":"+375291112233","medicalRecord":{"bloodType":"AB(IV) Rh+","allergies":[],"diagnoses":[]}}
-{"id":4,"fullName":"Новиков Денис Олегович","birthDate":"1995-07-19","phone":"+375291112233","medicalRecord":{"bloodType":"AB(IV) Rh+","allergies":[],"diagnoses":[]}}
+>>> Тело запроса: {"fullName":"Новиков Денис Олегович","birthDate":"1995-07-19","medicalRecord":{"bloodType":"AB(IV) Rh+","allergies":[],"diagnoses":[]}}
+{"id":3,"fullName":"Новиков Денис Олегович","birthDate":"1995-07-19","medicalRecord":{"bloodType":"AB(IV) Rh+","allergies":[],"diagnoses":[]}}
 >>> HTTP-статус: 201
 
 ==================================================================
 >>> POST /api/patients
->>> Тело запроса: {"phone":"+375291112233"}
-{"error":"Не заполнены обязательные поля: fullName, birthDate"}
+>>> Тело запроса: {"birthDate":"1995-07-19"}
+{"error":"Заполните поля: fullName, birthDate"}
 >>> HTTP-статус: 400
 
 ==================================================================
->>> PUT /api/patients/5
->>> Тело запроса: {"fullName":"Временный Пациент Изменённый","birthDate":"2000-01-01","phone":"+375290000000","medicalRecord":{"bloodType":"O(I) Rh+","allergies":["йод"],"diagnoses":[]}}
-{"id":5,"fullName":"Временный Пациент Изменённый","birthDate":"2000-01-01","phone":"+375290000000","medicalRecord":{"bloodType":"O(I) Rh+","allergies":["йод"],"diagnoses":[]}}
+>>> PUT /api/patients/4
+>>> Тело запроса: {"fullName":"Временный Пациент Изменённый","birthDate":"2000-01-01","medicalRecord":{"bloodType":"O(I) Rh+","allergies":["йод"],"diagnoses":[]}}
+{"id":4,"fullName":"Временный Пациент Изменённый","birthDate":"2000-01-01","medicalRecord":{"bloodType":"O(I) Rh+","allergies":["йод"],"diagnoses":[]}}
 >>> HTTP-статус: 200
 
 ==================================================================
->>> DELETE /api/patients/5
+>>> DELETE /api/patients/4
 
 >>> HTTP-статус: 204
 
 ##################  НЕИЗВЕСТНЫЙ МАРШРУТ  #######################
 ==================================================================
 >>> GET /api/doctors
-{"error":"Маршрут GET /api/doctors не найден"}
+{"error":"Маршрут не найден"}
 >>> HTTP-статус: 404
 
-
-############  ДОПОЛНИТЕЛЬНО: ГЛОБАЛЬНЫЙ ОБРАБОТЧИК ОШИБОК  ############
-==================================================================
->>> POST /api/patients с некорректным JSON в теле
->>> Тело запроса: {fullName: сломанный}
-{"error":"Тело запроса не является корректным JSON"}
->>> HTTP-статус: 400
-
-==================================================================
->>> POST /api/patients без заголовка Content-Type: application/json
-{"error":"Не заполнены обязательные поля: fullName, birthDate"}
->>> HTTP-статус: 400
