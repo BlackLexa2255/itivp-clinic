@@ -18,6 +18,13 @@ let patients = [
 ];
 let nextPatientId = 3;
 
+app.get('/', (req, res) => {
+  res.json({
+    service: 'Сервис записи на приём к врачу с электронной картой пациента',
+    endpoints: ['/api/appointments', '/api/patients']
+  });
+});
+
 app.get('/api/appointments', (req, res) => {
   if (req.query.status) {
     return res.json(appointments.filter(item => item.status === req.query.status));
