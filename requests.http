@@ -1,21 +1,18 @@
-### Лабораторная работа 1 — проверка API через REST Client (VS Code)
-### Установите расширение "REST Client" и нажимайте "Send Request" над каждым запросом.
-
 @baseUrl = http://localhost:3000
 
-### Список всех записей на приём — 200
+###
 GET {{baseUrl}}/api/appointments
 
-### Фильтр по строке запроса (query string) — 200
+###
 GET {{baseUrl}}/api/appointments?status=scheduled
 
-### Одна запись по id (route param) — 200
+###
 GET {{baseUrl}}/api/appointments/1
 
-### Несуществующая запись — 404
+###
 GET {{baseUrl}}/api/appointments/999
 
-### Создание записи на приём — 201
+###
 POST {{baseUrl}}/api/appointments
 Content-Type: application/json
 
@@ -26,13 +23,13 @@ Content-Type: application/json
   "time": "11:00"
 }
 
-### Создание без обязательных полей — 400
+###
 POST {{baseUrl}}/api/appointments
 Content-Type: application/json
 
 {}
 
-### Полное обновление записи — 200
+###
 PUT {{baseUrl}}/api/appointments/4
 Content-Type: application/json
 
@@ -44,7 +41,7 @@ Content-Type: application/json
   "status": "completed"
 }
 
-### Обновление несуществующей записи — 404
+###
 PUT {{baseUrl}}/api/appointments/999
 Content-Type: application/json
 
@@ -55,22 +52,22 @@ Content-Type: application/json
   "time": "13:30"
 }
 
-### Удаление записи — 204
+###
 DELETE {{baseUrl}}/api/appointments/4
 
-### Повторное удаление той же записи — 404
+###
 DELETE {{baseUrl}}/api/appointments/4
 
-### Список пациентов — 200
+###
 GET {{baseUrl}}/api/patients
 
-### Пациент с электронной картой — 200
+###
 GET {{baseUrl}}/api/patients/1
 
-### Несуществующий пациент — 404
+###
 GET {{baseUrl}}/api/patients/999
 
-### Добавление пациента — 201
+###
 POST {{baseUrl}}/api/patients
 Content-Type: application/json
 
@@ -84,7 +81,7 @@ Content-Type: application/json
   }
 }
 
-### Добавление пациента без обязательных полей — 400
+###
 POST {{baseUrl}}/api/patients
 Content-Type: application/json
 
@@ -92,8 +89,8 @@ Content-Type: application/json
   "birthDate": "1995-07-19"
 }
 
-### Полное обновление пациента — 200
-PUT {{baseUrl}}/api/patients/4
+###
+PUT {{baseUrl}}/api/patients/3
 Content-Type: application/json
 
 {
@@ -106,9 +103,9 @@ Content-Type: application/json
   }
 }
 
-### Удаление пациента — 204
-DELETE {{baseUrl}}/api/patients/4
+###
+DELETE {{baseUrl}}/api/patients/3
 
-### Неизвестный маршрут — 404
+###
 GET {{baseUrl}}/api/doctors
 
