@@ -1,6 +1,3 @@
-// Хранилище пациентов. Электронная карта пациента — вложенный объект medicalRecord.
-// Как и записи на приём, данные пока лежат в массиве в памяти сервера.
-
 let patients = [
   {
     id: 1,
@@ -37,14 +34,12 @@ let patients = [
   }
 ];
 
-// Счётчик для выдачи id новым пациентам
 let nextId = 4;
 
 function findAll() {
   return patients;
 }
 
-// Один пациент по id (undefined, если такого нет)
 function findById(id) {
   return patients.find(patient => patient.id === id);
 }
@@ -61,7 +56,6 @@ function create(data) {
   return patient;
 }
 
-// Полная замена полей пациента (PUT). Возвращает undefined, если пациента нет
 function update(id, data) {
   const patient = findById(id);
   if (!patient) {
@@ -74,7 +68,6 @@ function update(id, data) {
   return patient;
 }
 
-// true — пациент удалён, false — пациента с таким id не было
 function remove(id) {
   const index = patients.findIndex(patient => patient.id === id);
   if (index === -1) {

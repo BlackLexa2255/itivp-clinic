@@ -1,4 +1,3 @@
-// Маршруты ресурса «пациенты».
 const express = require('express');
 const patientsController = require('../controllers/patients.controller');
 

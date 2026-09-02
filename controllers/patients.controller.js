@@ -1,20 +1,15 @@
-// Контроллер пациентов: устроен так же, как контроллер записей на приём.
 const patientsModel = require('../models/patients.model');
 
-// Поля, без которых карточку пациента заводить нельзя
 const REQUIRED_FIELDS = ['fullName', 'birthDate'];
 
-// Список незаполненных обязательных полей. Пустое тело запроса считаем пустым объектом
 function getMissingFields(body = {}) {
   return REQUIRED_FIELDS.filter(field => !body[field]);
 }
 
-// GET /api/patients — список всех пациентов
 function getAll(req, res) {
   res.json(patientsModel.findAll());
 }
 
-// GET /api/patients/:id — один пациент вместе с электронной картой
 function getById(req, res) {
   const patient = patientsModel.findById(Number(req.params.id));
   if (!patient) {
@@ -23,7 +18,6 @@ function getById(req, res) {
   res.json(patient);
 }
 
-// POST /api/patients — добавление пациента
 function create(req, res) {
   const missingFields = getMissingFields(req.body);
   if (missingFields.length > 0) {
@@ -33,7 +27,6 @@ function create(req, res) {
   res.status(201).json(patient);
 }
 
-// PUT /api/patients/:id — полная замена данных пациента
 function update(req, res) {
   const missingFields = getMissingFields(req.body);
   if (missingFields.length > 0) {
@@ -46,7 +39,6 @@ function update(req, res) {
   res.json(patient);
 }
 
-// DELETE /api/patients/:id — удаление пациента
 function remove(req, res) {
   const isDeleted = patientsModel.remove(Number(req.params.id));
   if (!isDeleted) {

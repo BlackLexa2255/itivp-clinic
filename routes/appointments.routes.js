@@ -1,4 +1,3 @@
-// Маршруты ресурса «записи на приём»: связывают HTTP-метод и путь с функцией контроллера.
 const express = require('express');
 const appointmentsController = require('../controllers/appointments.controller');
 

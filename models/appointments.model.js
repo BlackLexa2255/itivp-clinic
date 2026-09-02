@@ -1,6 +1,3 @@
-// Хранилище записей на приём.
-// Пока это обычный массив в памяти сервера — база данных подключается в следующей лабораторной работе.
-
 let appointments = [
   {
     id: 1,
@@ -31,10 +28,8 @@ let appointments = [
   }
 ];
 
-// Счётчик для выдачи id новым записям
 let nextId = 4;
 
-// Все записи; если передан status — только записи с этим статусом
 function findAll(status) {
   if (status) {
     return appointments.filter(appointment => appointment.status === status);
@@ -42,7 +37,6 @@ function findAll(status) {
   return appointments;
 }
 
-// Одна запись по id (undefined, если такой нет)
 function findById(id) {
   return appointments.find(appointment => appointment.id === id);
 }
@@ -61,7 +55,6 @@ function create(data) {
   return appointment;
 }
 
-// Полная замена полей записи (PUT). Возвращает undefined, если записи нет
 function update(id, data) {
   const appointment = findById(id);
   if (!appointment) {
@@ -76,7 +69,6 @@ function update(id, data) {
   return appointment;
 }
 
-// true — запись удалена, false — записи с таким id не было
 function remove(id) {
   const index = appointments.findIndex(appointment => appointment.id === id);
   if (index === -1) {

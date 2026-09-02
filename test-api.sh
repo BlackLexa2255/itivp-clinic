@@ -1,10 +1,8 @@
 #!/bin/bash
-# Прогон всех эндпоинтов API.
-# Запуск: в одном терминале `npm run dev`, во втором `bash test-api.sh`
+# Запуск: bash test-api.sh (сервер должен быть запущен)
 
 BASE_URL="http://localhost:3000"
 
-# Печатает запрос, тело ответа и HTTP-статус
 request() {
   local method=$1
   local path=$2
@@ -30,7 +28,6 @@ request GET "/api/appointments/999"
 request POST "/api/appointments" '{"patientId":1,"doctorName":"Козлов Игорь Львович","specialty":"невролог","date":"2026-09-15","time":"11:00"}'
 request POST "/api/appointments" '{}'
 
-# Берём id только что созданной записи, чтобы скрипт можно было запускать повторно
 NEW_ID=$(curl -s -X POST "$BASE_URL/api/appointments" -H "Content-Type: application/json" \
   -d '{"patientId":2,"doctorName":"Козлов Игорь Львович","date":"2026-09-16","time":"12:00"}' \
   | sed -n 's/.*"id":\([0-9]*\).*/\1/p')
