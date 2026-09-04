@@ -6,8 +6,12 @@ const PORT = 3000;
 app.set('view engine', 'ejs');
 app.set('views', './views');
 
+const requestLog = [];
+
 app.use((req, res, next) => {
-  console.log(`${new Date().toLocaleTimeString()} ${req.method} ${req.url}`);
+  requestLog.push({ Время: new Date().toLocaleTimeString(), Метод: req.method, URL: req.url });
+  console.clear();
+  console.table(requestLog);
   next();
 });
 
