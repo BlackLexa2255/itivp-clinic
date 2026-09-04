@@ -1,0 +1,14 @@
+<%- include('partials/header') %>
+
+<h1>Добавить запись на приём</h1>
+
+<form method="POST" action="/add">
+  <label>Пациент<input name="patientName" required></label>
+  <label>Врач<input name="doctorName" required></label>
+  <label>Дата<input name="date" type="date" required></label>
+  <label>Время<input name="time" type="time" required></label>
+  <label>Диагноз<input name="diagnosis"></label>
+  <button type="submit">Добавить</button>
+</form>
+
+<%- include('partials/footer') %>

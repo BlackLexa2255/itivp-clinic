@@ -1,0 +1,18 @@
+<%- include('partials/header') %>
+
+<h1>Запись №<%= appointment.id %></h1>
+
+<dl>
+  <dt>Пациент</dt>
+  <dd><%= appointment.patientName %></dd>
+  <dt>Врач</dt>
+  <dd><%= appointment.doctorName %></dd>
+  <dt>Дата и время</dt>
+  <dd><%= appointment.date %>, <%= appointment.time %></dd>
+  <dt>Диагноз из карты пациента</dt>
+  <dd><%= appointment.diagnosis %></dd>
+</dl>
+
+<a href="/">Назад к списку</a>
+
+<%- include('partials/footer') %>

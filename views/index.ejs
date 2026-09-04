@@ -1,0 +1,28 @@
+<%- include('partials/header') %>
+
+<h1>Записи на приём</h1>
+
+<% if (appointments.length === 0) { %>
+  <p>Записей пока нет.</p>
+<% } else { %>
+  <table>
+    <tr>
+      <th>Пациент</th>
+      <th>Врач</th>
+      <th>Дата</th>
+      <th>Время</th>
+      <th></th>
+    </tr>
+    <% appointments.forEach(appointment => { %>
+      <tr>
+        <td><%= appointment.patientName %></td>
+        <td><%= appointment.doctorName %></td>
+        <td><%= appointment.date %></td>
+        <td><%= appointment.time %></td>
+        <td><a href="/item/<%= appointment.id %>">подробнее</a></td>
+      </tr>
+    <% }) %>
+  </table>
+<% } %>
+
+<%- include('partials/footer') %>
