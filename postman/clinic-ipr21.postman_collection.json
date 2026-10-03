@@ -12,6 +12,10 @@
     {
       "key": "token",
       "value": ""
+    },
+    {
+      "key": "adminToken",
+      "value": ""
     }
   ],
   "item": [
@@ -118,7 +122,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "const data = pm.response.json();",
-                  "if (data.token) { pm.collectionVariables.set('token', data.token); }",
+                  "if (data.token) { pm.collectionVariables.set('adminToken', data.token); }",
                   "pm.test('Статус 200', function () { pm.response.to.have.status(200); });"
                 ]
               }
@@ -284,7 +288,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "url": {
@@ -313,7 +317,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "url": {
@@ -336,7 +340,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "url": {
