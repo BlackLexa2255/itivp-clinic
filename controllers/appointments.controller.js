@@ -1,10 +1,39 @@
+const { Op } = require('sequelize');
 const { Appointment } = require('../models');
 const { logSecurityEvent } = require('../utils/securityLogger');
 
+// Фильтрация по статусу и дате, поиск по части фамилии врача, сортировка
 async function getAll(req, res, next) {
   try {
-    const where = req.query.status ? { status: req.query.status } : {};
-    res.json(await Appointment.findAll({ where, order: [['id', 'ASC']] }));
+    const where = {};
+    if (req.query.status) {
+      where.status = req.query.status;
+    }
+    if (req.query.date) {
+      where.date = req.query.date;
+    }
+    if (req.query.doctor) {
+      where.doctorName = { [Op.iLike]: `%${req.query.doctor}%` };
+    }
+    const order = req.query.sort ? [[req.query.sort, 'ASC']] : [['id', 'ASC']];
+    res.json(await Appointment.findAll({ where, order }));
+  } catch (err) {
+    next(err);
+  }
+}
+
+// Подсчёт записей по статусам
+async function getStats(req, res, next) {
+  try {
+    const rows = await Appointment.findAll({
+      attributes: ['status', [Appointment.sequelize.fn('COUNT', '*'), 'count']],
+      group: ['status']
+    });
+    const byStatus = {};
+    rows.forEach(row => {
+      byStatus[row.status] = Number(row.get('count'));
+    });
+    res.json({ total: await Appointment.count(), byStatus });
   } catch (err) {
     next(err);
   }
@@ -27,6 +56,10 @@ async function create(req, res, next) {
     const appointment = await Appointment.create({ ...req.body, userId: req.user.id });
     res.status(201).json(appointment);
   } catch (err) {
+    // Нарушение уникальности номера талона – это ошибка клиента, а не сервера
+    if (err.name === 'SequelizeUniqueConstraintError') {
+      return res.status(409).json({ error: 'Запись с таким номером талона уже существует' });
+    }
     next(err);
   }
 }
@@ -45,6 +78,9 @@ async function update(req, res, next) {
     await appointment.update(req.body);
     res.json(appointment);
   } catch (err) {
+    if (err.name === 'SequelizeUniqueConstraintError') {
+      return res.status(409).json({ error: 'Запись с таким номером талона уже существует' });
+    }
     next(err);
   }
 }
@@ -62,4 +98,4 @@ async function remove(req, res, next) {
   }
 }
 
-module.exports = { getAll, getById, create, update, remove };
+module.exports = { getAll, getStats, getById, create, update, remove };

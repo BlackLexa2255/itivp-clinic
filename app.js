@@ -1,5 +1,6 @@
 const express = require('express');
 const helmet = require('helmet');
+const cors = require('cors');
 
 const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/users.routes');
@@ -11,6 +12,10 @@ const app = express();
 
 // Заголовки безопасности: X-Frame-Options, Content-Security-Policy, X-Content-Type-Options и другие
 app.use(helmet());
+
+// Запросы с браузерной страницы разрешены только с адресов из белого списка
+const allowedOrigins = (process.env.CORS_ORIGINS || '').split(',').filter(Boolean);
+app.use(cors({ origin: allowedOrigins.length ? allowedOrigins : false }));
 
 // Ограничение размера тела запроса – защита от отправки больших объёмов данных (DoS)
 app.use(express.json({ limit: '10kb' }));

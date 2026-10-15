@@ -19,6 +19,7 @@ const login = Joi.object({
 });
 
 const appointment = Joi.object({
+  ticketCode: Joi.string().pattern(/^T-\d{4}-\d{4}$/).required(),
   patientName: Joi.string().min(3).max(100).required(),
   doctorName: Joi.string().min(3).max(100).required(),
   date: Joi.date().iso().required(),
@@ -30,7 +31,10 @@ const appointment = Joi.object({
 // Параметр строки запроса проверяется по списку допустимых значений,
 // поэтому подстановка постороннего текста отклоняется до обращения к базе
 const appointmentQuery = Joi.object({
-  status: Joi.string().valid('scheduled', 'completed', 'cancelled')
+  status: Joi.string().valid('scheduled', 'completed', 'cancelled'),
+  doctor: Joi.string().min(2).max(100),
+  date: Joi.date().iso(),
+  sort: Joi.string().valid('date', 'ticketCode')
 });
 
 const idParam = Joi.object({

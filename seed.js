@@ -20,12 +20,12 @@ async function seed() {
   }
 
   await Appointment.create({
-    patientName: 'Иванов Иван Иванович', doctorName: 'Петров Пётр Петрович',
+    ticketCode: 'T-2026-0001', patientName: 'Иванов Иван Иванович', doctorName: 'Петров Пётр Петрович',
     date: '2026-10-12', time: '10:30', status: 'scheduled', diagnosis: 'ОРВИ',
     userId: created.user.id
   });
   await Appointment.create({
-    patientName: 'Ковалёва Мария Петровна', doctorName: 'Сидорова Анна Сергеевна',
+    ticketCode: 'T-2026-0002', patientName: 'Ковалёва Мария Петровна', doctorName: 'Сидорова Анна Сергеевна',
     date: '2026-10-13', time: '09:00', status: 'completed', diagnosis: 'Гипертония',
     userId: created.moderator.id
   });

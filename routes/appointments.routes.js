@@ -8,6 +8,7 @@ const schemas = require('../validation/schemas');
 const router = express.Router();
 
 router.get('/', validate(schemas.appointmentQuery, 'query'), controller.getAll);
+router.get('/stats', controller.getStats);
 router.get('/:id', validate(schemas.idParam, 'params'), controller.getById);
 router.post('/', authenticate, validate(schemas.appointment), controller.create);
 router.put('/:id', authenticate, validate(schemas.idParam, 'params'), validate(schemas.appointment), controller.update);
