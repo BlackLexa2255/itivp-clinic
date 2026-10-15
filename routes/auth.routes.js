@@ -6,6 +6,8 @@ const schemas = require('../validation/schemas');
 
 const router = express.Router();
 
+// Проверка входных данных подключается до обработчика, /auth/me требует токен
+
 router.post('/register', validate(schemas.register), controller.register);
 router.post('/login', validate(schemas.login), controller.login);
 router.get('/me', authenticate, controller.me);

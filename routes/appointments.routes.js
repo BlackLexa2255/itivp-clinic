@@ -7,6 +7,8 @@ const schemas = require('../validation/schemas');
 
 const router = express.Router();
 
+// Маршрут статистики объявлен до /:id, иначе слово stats попало бы в параметр
+
 router.get('/', validate(schemas.appointmentQuery, 'query'), controller.getAll);
 router.get('/stats', controller.getStats);
 router.get('/:id', validate(schemas.idParam, 'params'), controller.getById);

@@ -1,5 +1,7 @@
 const { User } = require('../models');
 
+// Список пользователей возвращается без хешей паролей: за это отвечает toSafeJSON
+
 async function getAll(req, res, next) {
   try {
     const users = await User.findAll({ order: [['id', 'ASC']] });
