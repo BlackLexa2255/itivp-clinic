@@ -51,11 +51,12 @@ export default function AppointmentList() {
       <div className="filters">
         <input
           type="search"
+          aria-label="Поиск по фамилии врача"
           placeholder="Поиск по фамилии врача"
           value={doctor}
           onChange={e => setDoctor(e.target.value)}
         />
-        <select value={status} onChange={e => setStatus(e.target.value)}>
+        <select aria-label="Статус" value={status} onChange={e => setStatus(e.target.value)}>
           <option value="">Все статусы</option>
           {Object.entries(STATUS).map(([key, title]) => <option key={key} value={key}>{title}</option>)}
         </select>
