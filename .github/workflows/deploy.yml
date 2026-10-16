@@ -1,8 +1,10 @@
 name: CI/CD
 
+# Фронтенд собирает и публикует Vercel сам при push в kr22, здесь только бекенд
+
 on:
   push:
-    branches: [main, ipr22]
+    branches: [kr22]
   workflow_dispatch:
 
 jobs:
@@ -33,41 +35,9 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
             -H "Content-Type: application/json" -d '{"commitId":"${{ github.sha }}"}'
 
-  deploy-frontend:
-    name: Деплой фронтенда на GitHub Pages
-    needs: test
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 24
-          cache: npm
-          cache-dependency-path: client/package-lock.json
-      - name: Сборка фронтенда
-        working-directory: client
-        env:
-          VITE_API_URL: ${{ vars.VITE_API_URL }}
-          VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
-        run: |
-          npm ci
-          npm run build
-      - uses: actions/upload-pages-artifact@v4
-        with:
-          path: client/dist
-      - id: deployment
-        uses: actions/deploy-pages@v4
-
   notify:
     name: Уведомление в Telegram
-    needs: [test, deploy-backend, deploy-frontend]
+    needs: [test, deploy-backend]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -77,5 +47,5 @@ jobs:
             -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
             --data-urlencode text="${{ contains(needs.*.result, 'failure') && '❌ Сборка завершилась с ошибкой' || '✅ Сборка и деплой прошли успешно' }}
           Ветка: ${{ github.ref_name }}
-          Тесты: ${{ needs.test.result }}, бекенд: ${{ needs.deploy-backend.result }}, фронтенд: ${{ needs.deploy-frontend.result }}
+          Тесты: ${{ needs.test.result }}, бекенд: ${{ needs.deploy-backend.result }}
           ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

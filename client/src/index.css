@@ -6,30 +6,82 @@ body {
 }
 
 main {
-  max-width: 900px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 24px 16px;
 }
 
-nav button {
-  margin-right: 8px;
+a {
+  color: #2563eb;
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+nav a {
   padding: 8px 16px;
   border: 1px solid #2563eb;
   border-radius: 6px;
   background: #fff;
-  color: #2563eb;
-  cursor: pointer;
+  text-decoration: none;
 }
 
-nav button.active {
+nav a.active {
   background: #2563eb;
   color: #fff;
 }
 
-nav button.danger {
-  float: right;
+nav .user {
+  margin-left: auto;
+  color: #555;
+}
+
+button {
+  padding: 8px 16px;
+  border: 1px solid #2563eb;
+  border-radius: 6px;
+  background: #2563eb;
+  color: #fff;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+}
+
+button.secondary,
+nav button {
+  background: #fff;
+  color: #2563eb;
+}
+
+button.danger {
+  padding: 4px 10px;
   border-color: #dc2626;
+  background: #fff;
   color: #dc2626;
+}
+
+.filters {
+  display: flex;
+  gap: 8px;
+}
+
+input,
+select {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font: inherit;
+}
+
+.filters input {
+  flex: 1;
 }
 
 table {
@@ -45,11 +97,17 @@ th, td {
   text-align: left;
 }
 
+td:nth-child(1),
+td:nth-child(4),
+td:nth-child(5) {
+  white-space: nowrap;
+}
+
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 12px;
-  margin-top: 16px;
+  margin: 16px 0;
 }
 
 .card {
@@ -63,6 +121,52 @@ th, td {
   display: block;
   margin-top: 6px;
   font-size: 22px;
+}
+
+.form {
+  display: grid;
+  gap: 12px;
+  max-width: 480px;
+}
+
+.form label {
+  display: grid;
+  gap: 4px;
+}
+
+.form button {
+  justify-self: start;
+}
+
+.details {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 8px 16px;
+  padding: 16px;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.details dt {
+  color: #555;
+}
+
+.details dd {
+  margin: 0;
+}
+
+.actions a {
+  margin-right: 16px;
+}
+
+.loading {
+  color: #555;
+}
+
+.empty {
+  padding: 16px;
+  background: #fff;
+  color: #555;
 }
 
 .error {
