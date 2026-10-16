@@ -7,7 +7,7 @@ on:
 
 jobs:
   test:
-    name: Линтинг, тесты и сборка
+    name: Линтинг и тесты
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -15,73 +15,55 @@ jobs:
         with:
           node-version: 24
           cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            client/package-lock.json
-      - name: Установка зависимостей бекенда
+      - name: Установка зависимостей
         run: npm ci
-      - name: ESLint бекенда
+      - name: ESLint
         run: npm run lint
       - name: Тесты Jest
         run: npm test
-      - name: Установка зависимостей фронтенда
-        working-directory: client
-        run: npm ci
-      - name: ESLint фронтенда
-        working-directory: client
-        run: npm run lint
-      - name: Сборка фронтенда
-        working-directory: client
-        run: npm run build
 
   deploy-backend:
     name: Деплой бекенда на Render
     needs: test
     runs-on: ubuntu-latest
-    env:
-      RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-      SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
     steps:
-      - name: Запуск деплоя и ожидание результата
+      - name: Запуск деплоя через Render API
         run: |
-          API=https://api.render.com/v1/services/$SERVICE_ID/deploys
-          DEPLOY_ID=$(curl -fsS -X POST "$API" -H "Authorization: Bearer $RENDER_API_KEY" \
-            -H "Content-Type: application/json" -d '{"commitId":"${{ github.sha }}"}' | jq -r .id)
-          for i in $(seq 1 60); do
-            STATUS=$(curl -fsS "$API/$DEPLOY_ID" -H "Authorization: Bearer $RENDER_API_KEY" | jq -r .status)
-            echo "Статус деплоя: $STATUS"
-            case $STATUS in
-              live) exit 0 ;;
-              *failed|canceled|deactivated) exit 1 ;;
-            esac
-            sleep 10
-          done
-          exit 1
+          curl -fsS -X POST "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "Content-Type: application/json" -d '{"commitId":"${{ github.sha }}"}'
 
   deploy-frontend:
-    name: Деплой фронтенда на Vercel
+    name: Деплой фронтенда на GitHub Pages
     needs: test
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: client
-    env:
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
         with:
           node-version: 24
-      - name: Установка Vercel CLI
-        run: npm install -g vercel
-      - name: Загрузка настроек проекта и переменных окружения
-        run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
-      - name: Сборка
-        run: vercel build --prod --token=$VERCEL_TOKEN
-      - name: Публикация
-        run: vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - name: Сборка фронтенда
+        working-directory: client
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
+        run: |
+          npm ci
+          npm run build
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: client/dist
+      - id: deployment
+        uses: actions/deploy-pages@v4
 
   notify:
     name: Уведомление в Telegram
@@ -90,19 +72,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Отправка статуса сборки
-        env:
-          TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          RESULT: ${{ contains(needs.*.result, 'failure') && '❌ Сборка завершилась с ошибкой' || '✅ Сборка и деплой прошли успешно' }}
-          COMMIT: ${{ github.event.head_commit.message }}
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          TEXT="$RESULT
+          curl -fsS -o /dev/null "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+            --data-urlencode text="${{ contains(needs.*.result, 'failure') && '❌ Сборка завершилась с ошибкой' || '✅ Сборка и деплой прошли успешно' }}
           Ветка: ${{ github.ref_name }}
-          Коммит: ${COMMIT%%$'\n'*}
-          Тесты: ${{ needs.test.result }}
-          Бекенд: ${{ needs.deploy-backend.result }}
-          Фронтенд: ${{ needs.deploy-frontend.result }}
-          $RUN_URL"
-          curl -fsS -o /dev/null -X POST "https://api.telegram.org/bot$TOKEN/sendMessage" \
-            -d chat_id="$CHAT_ID" --data-urlencode text="$TEXT"
+          Тесты: ${{ needs.test.result }}, бекенд: ${{ needs.deploy-backend.result }}, фронтенд: ${{ needs.deploy-frontend.result }}
+          ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

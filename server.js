@@ -2,7 +2,6 @@ require('./instrument');
 
 const app = require('./app');
 const { sequelize } = require('./models');
-const logger = require('./utils/logger');
 
 const PORT = process.env.PORT || 3000;
 
@@ -10,23 +9,28 @@ async function start() {
   await sequelize.authenticate();
   await sequelize.sync();
   app.listen(PORT, () => {
-    logger.info('Сервер запущен', { port: Number(PORT), env: process.env.NODE_ENV });
+    console.log(`Сервер запущен на порту ${PORT}`);
+    setInterval(heartbeat, 60 * 1000);
   });
-  startHeartbeat();
 }
 
-// Раз в минуту сервер сообщает Healthchecks.io, что он жив. Если сигналы перестают
-// приходить, Healthchecks.io присылает уведомление о падении в Telegram
-function startHeartbeat() {
-  const url = process.env.HEALTHCHECKS_PING_URL;
-  if (!url) return;
-  const ping = () => fetch(url).catch(err => logger.warn('Healthchecks.io недоступен', { error: err.message }));
-  ping();
-  setInterval(ping, 60 * 1000);
+// Раз в минуту сервер запрашивает свой /health по внешнему адресу и, если тот отвечает,
+// отправляет сигнал в Healthchecks.io. Когда сигналы перестают приходить, Healthchecks.io
+// присылает уведомление о падении в Telegram. Внешний запрос заодно не даёт Render
+// усыпить бесплатный сервис после 15 минут без входящих запросов
+async function heartbeat() {
+  const selfUrl = process.env.RENDER_EXTERNAL_URL;
+  const pingUrl = process.env.HEALTHCHECKS_PING_URL;
+  if (!selfUrl || !pingUrl) return;
+  try {
+    const res = await fetch(`${selfUrl}/health`);
+    if (res.ok) await fetch(pingUrl);
+  } catch (err) {
+    console.warn('Не удалось отправить сигнал в Healthchecks.io:', err.message);
+  }
 }
 
 start().catch(err => {
-  logger.error('Не удалось запустить сервер', { error: err.message });
-  // Пауза, чтобы сообщение успело уйти в Better Stack
-  setTimeout(() => process.exit(1), 2000);
+  console.error('Не удалось запустить сервер:', err.message);
+  process.exit(1);
 });
