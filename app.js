@@ -12,8 +12,9 @@ const { countRequests, getMetrics } = require('./utils/metrics');
 
 const app = express();
 
-// На Render приложение работает за прокси: без этого все клиенты имели бы один IP прокси
-app.set('trust proxy', 1);
+// На Render перед приложением три прокси (Cloudflare и два внутренних узла Render):
+// без этой настройки req.ip был бы адресом прокси, и ограничитель частоты считал бы всех клиентов одним
+app.set('trust proxy', 3);
 
 // Заголовки безопасности: X-Frame-Options, Content-Security-Policy, X-Content-Type-Options и другие
 app.use(helmet());
