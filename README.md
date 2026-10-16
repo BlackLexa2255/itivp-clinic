@@ -1,10 +1,50 @@
-# REST API сервиса записи на приём к врачу (КР1)
+# Сервис записи на приём к врачу: деплой и мониторинг (ИПР2)
 
-Контрольная работа №1. Node.js, Express, PostgreSQL через Sequelize.
-Регистрация и вход по JWT, роли, CRUD для записей на приём, фильтрация, поиск,
-сортировка и статистика.
+Индивидуальная практическая работа №2, ветка ipr22. Бекенд из КР1 (Node.js, Express,
+PostgreSQL) и простой фронтенд на React выложены в облако. Настроены CI/CD,
+мониторинг, сбор ошибок и логов, уведомления в Telegram.
 
-## Запуск
+## Ссылки
+
+Фронтенд: https://blacklexa2255.github.io/itivp-clinic/
+
+Бекенд: https://itivp-clinic.onrender.com
+(проверка https://itivp-clinic.onrender.com/health, метрики https://itivp-clinic.onrender.com/metrics)
+
+CI/CD: https://github.com/BlackLexa2255/itivp-clinic/actions
+
+Мониторинг Healthchecks.io: ![статус](https://healthchecks.io/b/2/f80a8f4b-e28d-4f08-b8c0-bcc36459319b.svg)
+
+Ошибки и логи: Sentry, разделы Issues и Logs. Дашборд закрытый, скриншоты есть в отчёте.
+
+Уведомления в Telegram: бот @ITIVPBOT пишет о результате каждой сборки,
+@HealthchecksBot пишет, когда сервер падает и когда снова поднимается.
+
+## Что где развёрнуто
+
+- бекенд – Render, тариф Free, регион Frankfurt;
+- база данных – Neon (PostgreSQL), тариф Free;
+- фронтенд – GitHub Pages;
+- ошибки и логи – Sentry, один проект на бекенд и фронтенд. Логи – это вызовы console на сервере;
+- мониторинг – Healthchecks.io. Сервер раз в минуту запрашивает свой /health по внешнему адресу и,
+  если тот ответил, шлёт сигнал в Healthchecks.io. Нет сигнала 3 минуты – приходит сообщение в Telegram.
+  Этот же запрос не даёт бесплатному Render засыпать.
+
+## CI/CD
+
+Файл .github/workflows/deploy.yml. Запускается при push в ipr22 или main и вручную.
+
+1. test – npm ci, ESLint, тесты Jest;
+2. deploy-backend – запуск деплоя на Render через Render API (автодеплой в самом Render выключен);
+3. deploy-frontend – сборка Vite и публикация на GitHub Pages;
+4. notify – сообщение в Telegram с результатом, запускается всегда.
+
+Деплои запускаются только если test прошёл.
+
+Секреты GitHub: RENDER_API_KEY, RENDER_SERVICE_ID, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID.
+Переменные GitHub: VITE_API_URL, VITE_SENTRY_DSN.
+
+## Запуск локально
 
 Нужны Node.js и PostgreSQL.
 
@@ -16,9 +56,26 @@ npm run seed
 npm run dev
 ```
 
-Сервер стартует на http://localhost:3000.
-В .env надо указать строку подключения к базе, секрет для токенов и список
-разрешённых адресов для CORS.
+Фронтенд (обращается к http://localhost:3000, если не задан VITE_API_URL):
+
+```
+cd client
+npm install
+npm run dev
+```
+
+Проверки: `npm run lint` и `npm test`.
+
+## Переменные окружения бекенда
+
+DATABASE_URL — строка подключения к PostgreSQL
+JWT_SECRET — секрет для подписи токенов
+NODE_ENV — production на Render
+CORS_ORIGINS — с каких адресов можно обращаться (на Render https://blacklexa2255.github.io)
+SENTRY_DSN — проект в Sentry, без него ошибки и логи никуда не отправляются
+HEALTHCHECKS_PING_URL — адрес проверки в Healthchecks.io
+
+RENDER_EXTERNAL_URL Render задаёт сам, по нему сервер проверяет свой /health.
 
 ## Тестовые пользователи
 
@@ -28,59 +85,9 @@ user@clinic.by / User#2026 — user
 
 ## Эндпоинты
 
-POST /auth/register — регистрация
-POST /auth/login — вход, возвращает токен
-GET /auth/me — текущий пользователь (нужен токен)
+GET /health — сервер жив (для мониторинга)
+GET /metrics — время работы, память, процессор, счётчик запросов
+GET /debug-sentry — тестовая ошибка для Sentry
 
-GET /api/appointments — список записей
-GET /api/appointments?status=scheduled — фильтр по статусу
-GET /api/appointments?doctor=козлов — поиск по части фамилии врача
-GET /api/appointments?date=2026-10-20 — фильтр по дате
-GET /api/appointments?sort=ticketCode — сортировка
-GET /api/appointments/stats — количество записей по статусам
-GET /api/appointments/:id — одна запись
-POST /api/appointments — создать (нужен токен)
-PUT /api/appointments/:id — обновить (автор записи, модератор или админ)
-DELETE /api/appointments/:id — удалить (только админ)
-
-GET /api/users — список пользователей (модератор, админ)
-DELETE /api/users/:id — удалить пользователя (только админ)
-
-Подробнее про тела запросов и коды ответов — в API.md.
-
-## Сущность «Запись на приём»
-
-ticketCode — номер талона, уникальный, формат T-ГГГГ-НННН
-patientName — ФИО пациента
-doctorName — ФИО врача
-date — дата приёма
-time — время приёма
-status — scheduled, completed или cancelled
-diagnosis — диагноз из электронной карты (необязательно)
-userId — кто создал запись
-
-## Защита
-
-- пароли хранятся как хеш bcrypt;
-- токен JWT живёт 1 час, передаётся в заголовке Authorization;
-- проверка сложности пароля: от 8 символов, цифра, спецсимвол;
-- после 5 неудачных входов аккаунт блокируется на 15 минут;
-- ограничение 100 запросов за 15 минут;
-- размер тела запроса ограничен 10 КБ;
-- CORS только для адресов из CORS_ORIGINS;
-- подозрительные события пишутся в logs/security.log.
-
-## Тесты
-
-Коллекция: postman/clinic-kr21.postman_collection.json — 24 запроса, у каждого
-проверка кода ответа.
-
-Можно импортировать в Postman или прогнать из терминала:
-
-```
-npm run seed
-npx newman run postman/clinic-kr21.postman_collection.json
-```
-
-Перед прогоном нужен npm run seed: часть запросов рассчитана на исходные данные
-(например, регистрация patient@clinic.by ожидает код 201).
+Остальные как в КР1: /auth/register, /auth/login, /auth/me, /api/appointments, /api/users.
+Подробнее в API.md.
