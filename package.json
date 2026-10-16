@@ -8,7 +8,7 @@
     "dev": "nodemon server.js",
     "seed": "node seed.js",
     "lint": "eslint .",
-    "test": "jest"
+    "test": "jest --verbose"
   },
   "engines": {
     "node": ">=20"
