@@ -26,7 +26,8 @@ function validate(schema, source = 'body') {
   return (req, res, next) => {
     const { error, value } = schema.validate(req[source], { abortEarly: false, stripUnknown: true });
     if (error) {
-      logSecurityEvent('VALIDATION_FAILED', req, { details: error.details.map(d => d.message) });
+      // В лог пишется поле и тип ошибки без значения, чтобы туда не попал пароль
+      logSecurityEvent('VALIDATION_FAILED', req, { details: error.details.map(d => `${d.path.join('.')}: ${d.type}`) });
       return res.status(400).json({
         error: 'Некорректные данные запроса',
         details: error.details.map(d => d.message)
